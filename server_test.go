@@ -1,6 +1,9 @@
 package mbserver
 
 import (
+	"flag"
+	"github.com/goburrow/serial"
+	"log"
 	"testing"
 	"time"
 
@@ -135,4 +138,76 @@ func TestModbus(t *testing.T) {
 	if !isEqual(expect, got) {
 		t.Errorf("expected %v, got %v", expect, got)
 	}
+}
+
+func TestRtuServer(t *testing.T) {
+	mbserver := NewServer()
+	err := mbserver.ListenRTU(&serial.Config{
+		Address:  "COM2",
+		BaudRate: 115200,
+		DataBits: 8,
+		StopBits: 1,
+		Parity:   "N",
+		Timeout:  30 * time.Second})
+	if err != nil {
+		t.Fatalf("failed to listen, got %v\n", err)
+	}
+
+	for {
+		time.Sleep(1 * time.Second)
+	}
+
+}
+
+var (
+	address  string
+	baudrate int
+	databits int
+	stopbits int
+	parity   string
+
+	message string
+)
+
+func TestSerialPort(t *testing.T) {
+	flag.StringVar(&address, "a", "COM2", "address")
+	flag.IntVar(&baudrate, "b", 115200, "baud rate")
+	flag.IntVar(&databits, "d", 8, "data bits")
+	flag.IntVar(&stopbits, "s", 1, "stop bits")
+	flag.StringVar(&parity, "p", "N", "parity (N/E/O)")
+	flag.StringVar(&message, "m", "serial", "message")
+	flag.Parse()
+	config := serial.Config{
+		Address:  address,
+		BaudRate: baudrate,
+		DataBits: databits,
+		StopBits: stopbits,
+		Parity:   parity,
+		Timeout:  30 * time.Second,
+	}
+	log.Printf("connecting %+v", config)
+	port, err := serial.Open(&config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("connected")
+	buffer := make([]byte, 512)
+	for {
+
+		read, err := port.Read(buffer)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		log.Printf("read %d bytes", read)
+		log.Printf("%v", buffer[:read])
+	}
+
+	defer func() {
+		err := port.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("closed")
+	}()
 }
