@@ -143,12 +143,12 @@ func TestModbus(t *testing.T) {
 func TestRtuServer(t *testing.T) {
 	mbserver := NewServer()
 	err := mbserver.ListenRTU(&serial.Config{
-		Address:  "COM2",
-		BaudRate: 115200,
+		Address:  "COM1",
+		BaudRate: 9600,
 		DataBits: 8,
 		StopBits: 1,
 		Parity:   "N",
-		Timeout:  30 * time.Second})
+		Timeout:  100 * time.Millisecond})
 	if err != nil {
 		t.Fatalf("failed to listen, got %v\n", err)
 	}

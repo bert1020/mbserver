@@ -40,14 +40,19 @@ SkipFrameError:
 		}
 
 		bytesRead, err := port.Read(buffer)
+		//fmt.Printf("Read %d bytes, bytes :% X\n", bytesRead, buffer[:bytesRead])
+		if bytesRead == 0 {
+			continue
+		}
 		if err != nil {
 			if err != io.EOF {
 				log.Printf("serial read error %v\n", err)
+				continue
 			}
-			return
 		}
+
 		accumulatedData = append(accumulatedData, buffer[:bytesRead]...)
-		if bytesRead >= 3 {
+		if bytesRead >= 5 {
 
 			frame, err := NewRTUFrame(accumulatedData)
 			if err != nil {
@@ -59,6 +64,8 @@ SkipFrameError:
 			request := &Request{port, frame}
 
 			s.requestChan <- request
+		} else {
+
 		}
 	}
 }

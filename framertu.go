@@ -25,6 +25,7 @@ func NewRTUFrame(packet []byte) (*RTUFrame, error) {
 	crcExpect := binary.LittleEndian.Uint16(packet[pLen-2 : pLen])
 	crcCalc := crcModbus(packet[0 : pLen-2])
 	if crcCalc != crcExpect {
+		fmt.Printf("RTU Frame error: CRC (expected 0x%x, got 0x%x)", crcExpect, crcCalc)
 		return nil, fmt.Errorf("RTU Frame error: CRC (expected 0x%x, got 0x%x)", crcExpect, crcCalc)
 	}
 
