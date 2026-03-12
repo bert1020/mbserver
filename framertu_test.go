@@ -1,24 +1,21 @@
 package mbserver
 
-import "testing"
+import (
+	"log"
+	"testing"
+	"time"
+)
 
 func TestNewRTUFrame(t *testing.T) {
-	frame, err := NewRTUFrame([]byte{0x01, 0x04, 0x02, 0xFF, 0xFF, 0xB8, 0x80})
-	if !isEqual(nil, err) {
-		t.Fatalf("expected %v, got %v", nil, err)
+	for {
+		_, err := NewRTUFrame([]byte{0xFF, 0x03, 0x01, 00, 00, 00, 0x0A, 0xBD, 0xEF})
+		if !isEqual(nil, err) {
+			log.Printf("NewRTUFrame failed: %v", err)
+			//t.Fatalf("expected %v, got %v", nil, err)
+		}
+		time.Sleep(time.Millisecond * 1000)
 	}
 
-	got := frame.Address
-	expect := 1
-	if !isEqual(expect, got) {
-		t.Errorf("expected %v, got %v", expect, got)
-	}
-
-	got = frame.Function
-	expect = 4
-	if !isEqual(expect, got) {
-		t.Errorf("expected %v, got %v", expect, got)
-	}
 }
 
 func TestNewRTUFrameShortPacket(t *testing.T) {

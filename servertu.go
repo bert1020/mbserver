@@ -51,20 +51,17 @@ SkipFrameError:
 		}
 
 		accumulatedData = append(accumulatedData, buffer[:bytesRead]...)
-		if bytesRead >= 5 {
-
+		if len(accumulatedData) >= 3 {
 			frame, err := NewRTUFrame(accumulatedData)
+			accumulatedData = nil
 			if err != nil {
 				continue SkipFrameError
 				//return
 			}
-			accumulatedData = nil
 
 			request := &Request{port, frame}
 
 			s.requestChan <- request
-		} else {
-
 		}
 	}
 }
