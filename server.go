@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/goburrow/serial"
 	"io"
-	"log"
 	"net"
 	"sync"
 )
@@ -95,10 +94,10 @@ func (s *Server) handler() {
 		request := <-s.requestChan
 		response := s.handle(request)
 		if response == nil {
-			log.Println("不需要返回数据")
+			//log.Println("不需要返回数据")
 			continue
 		}
-		log.Printf("返回数据: % X \n", response.Bytes())
+		//log.Printf("返回数据: % X \n", response.Bytes())
 		_, err := request.conn.Write(response.Bytes())
 		if err != nil {
 			fmt.Printf("返回RTU串口出错: %v \n", err)
