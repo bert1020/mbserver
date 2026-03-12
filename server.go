@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/goburrow/serial"
 )
@@ -76,7 +77,6 @@ func (s *Server) handle(request *Request) Framer {
 		data, exception = s.function[function](s, request.frame)
 		response.SetData(data)
 	} else {
-		fmt.Printf("===Function %v does not exist\n", function)
 		exception = &IllegalFunction
 	}
 
@@ -92,7 +92,7 @@ func (s *Server) handler() {
 	for {
 		request := <-s.requestChan
 		response := s.handle(request)
-		//fmt.Printf("返回数据: % X \n", response.Bytes())
+		fmt.Printf("%v返回数据: % X \n", time.Now(), response.Bytes())
 		_, err := request.conn.Write(response.Bytes())
 		if err != nil {
 			fmt.Printf("返回RTU串口出错: %v \n", err)

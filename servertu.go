@@ -1,10 +1,9 @@
 package mbserver
 
 import (
+	"github.com/goburrow/serial"
 	"io"
 	"log"
-
-	"github.com/goburrow/serial"
 )
 
 // ListenRTU starts the Modbus server listening to a serial device.
@@ -40,7 +39,7 @@ SkipFrameError:
 		}
 
 		bytesRead, err := port.Read(buffer)
-		//fmt.Printf("Read %d bytes, bytes :% X\n", bytesRead, buffer[:bytesRead])
+		//fmt.Printf("%v 请求Read %d bytes, bytes :% X\n", time.Now(), bytesRead, buffer[:bytesRead])
 		if bytesRead == 0 {
 			continue
 		}

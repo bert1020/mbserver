@@ -148,7 +148,7 @@ func TestRtuServer(t *testing.T) {
 		DataBits: 8,
 		StopBits: 1,
 		Parity:   "N",
-		Timeout:  100 * time.Millisecond})
+		Timeout:  1 * time.Millisecond})
 	if err != nil {
 		t.Fatalf("failed to listen, got %v\n", err)
 	}

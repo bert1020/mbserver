@@ -39,8 +39,9 @@ import "sync"
 var crcTable []uint16
 var mux sync.Mutex
 
-func crcModbus(data []byte) uint16 {
+func crcModbus(data []byte) (crc uint16) {
 	if crcTable == nil {
+		// Thread safe initialization.
 		mux.Lock()
 		if crcTable == nil {
 			crcInitTable()
@@ -48,25 +49,30 @@ func crcModbus(data []byte) uint16 {
 		mux.Unlock()
 	}
 
-	crc := uint16(0xFFFF) // Modbus 初始值
-	for _, b := range data {
-		crc = (crc >> 8) ^ crcTable[(crc^uint16(b))&0xFF]
+	crc = 0xffff
+	for _, v := range data {
+		crc = (crc >> 8) ^ crcTable[(crc^uint16(v))&0x00FF]
 	}
+
 	return crc
 }
 
 func crcInitTable() {
+	crc16IBM := uint16(0xA001)
 	crcTable = make([]uint16, 256)
-	polynomial := uint16(0xA001) // Modbus 多项式
 
-	for i := 0; i < 256; i++ {
-		crc := uint16(i)
-		for j := 0; j < 8; j++ {
-			if (crc & 1) == 1 {
-				crc = (crc >> 1) ^ polynomial
+	for i := uint16(0); i < 256; i++ {
+
+		crc := uint16(0)
+		c := i
+
+		for j := uint16(0); j < 8; j++ {
+			if ((crc ^ c) & 0x0001) > 0 {
+				crc = (crc >> 1) ^ crc16IBM
 			} else {
-				crc >>= 1
+				crc = crc >> 1
 			}
+			c = c >> 1
 		}
 		crcTable[i] = crc
 	}
