@@ -3,12 +3,11 @@ package mbserver
 
 import (
 	"fmt"
+	"github.com/goburrow/serial"
 	"io"
+	"log"
 	"net"
 	"sync"
-	"time"
-
-	"github.com/goburrow/serial"
 )
 
 // Server is a Modbus slave with allocated memory for discrete inputs, coils, etc.
@@ -75,6 +74,9 @@ func (s *Server) handle(request *Request) Framer {
 	function := request.frame.GetFunction()
 	if s.function[function] != nil {
 		data, exception = s.function[function](s, request.frame)
+		if exception == nil {
+			return nil
+		}
 		response.SetData(data)
 	} else {
 		exception = &IllegalFunction
@@ -92,7 +94,11 @@ func (s *Server) handler() {
 	for {
 		request := <-s.requestChan
 		response := s.handle(request)
-		fmt.Printf("%v返回数据: % X \n", time.Now(), response.Bytes())
+		if response == nil {
+			log.Println("不需要返回数据")
+			continue
+		}
+		log.Printf("返回数据: % X \n", response.Bytes())
 		_, err := request.conn.Write(response.Bytes())
 		if err != nil {
 			fmt.Printf("返回RTU串口出错: %v \n", err)

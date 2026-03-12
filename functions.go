@@ -2,10 +2,12 @@ package mbserver
 
 import (
 	"encoding/binary"
+	"log"
 )
 
 // ReadCoils function 1, reads coils from internal memory.
 func ReadCoils(s *Server, frame Framer) ([]byte, *Exception) {
+	log.Printf("收到读数据% X \n", frame.Bytes())
 	register, numRegs, endRegister := registerAddressAndNumber(frame)
 	if endRegister > 65535 {
 		return []byte{}, &IllegalDataAddress
