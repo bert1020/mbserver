@@ -27,7 +27,7 @@ func NewRTUFrame(packet []byte) (*RTUFrame, error) {
 
 	crcCalc := crcModbus(packet[0 : pLen-2])
 	if crcCalc != crcExpect {
-		log.Printf("收到的数据为% X \n", packet)
+		log.Printf(" RTU Frame error: CRC[% X](expected 0x%x, got 0x%x)\n", packet, crcExpect, crcCalc)
 		return nil, fmt.Errorf("RTU Frame error: CRC (expected 0x%x, got 0x%x \n)", crcExpect, crcCalc)
 	}
 
